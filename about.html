@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRANTO | ABOUT ME</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #050508; --skill-cyan: #00f0ff; --skill-purple: #b026ff; --text-main: #f1f5f9; --text-muted: #94a3b8; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* Navigation */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 25px 8%; background: rgba(5, 5, 8, 0.95); position: fixed; width: 100%; z-index: 1000; border-bottom: 1px solid rgba(0, 240, 255, 0.1); }
+        @keyframes smoothBounce { 0% { transform: translateY(0); text-shadow: 0 0 5px var(--skill-cyan); } 100% { transform: translateY(-7px); text-shadow: 0 0 15px var(--skill-cyan); } }
+        .logo { font-size: 1.5rem; font-weight: 700; cursor: pointer; animation: smoothBounce 0.8s ease-in-out infinite alternate; }
+        .logo span { color: var(--skill-cyan); }
+        nav ul { display: flex; list-style: none; gap: 30px; }
+        nav ul li a { text-decoration: none; color: var(--text-main); font-weight: 600; text-transform: uppercase; transition: 0.3s; }
+        nav ul li a:hover, nav ul li a.active { color: var(--skill-cyan); text-shadow: 0 0 10px var(--skill-cyan); }
+        nav ul li a.active { animation: smoothBounce 0.8s ease-in-out infinite alternate; }
+
+        /* Content & 3-Column Grid */
+        .content { padding: 150px 8% 60px 8%; max-width: 1400px; margin: 0 auto; flex: 1; }
+        .title { font-size: 3rem; margin-bottom: 50px; text-align: center; font-weight: 700; }
+        .title span { color: var(--skill-cyan); }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; } /* 3-Column layout */
+        @media (max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+
+        .card { background: rgba(20, 20, 35, 0.5); padding: 35px; border-radius: 20px; border: 1px solid rgba(0, 240, 255, 0.05); transition: all 0.4s ease; opacity: 0; animation: slideUp 0.8s ease-out forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .card:hover { border: 1px solid var(--skill-cyan); box-shadow: 0 0 20px rgba(0, 240, 255, 0.2); transform: translateY(-10px); }
+        
+        h3 { color: var(--skill-cyan); margin-bottom: 15px; font-weight: 600; font-size: 1.2rem; }
+        p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; }
+
+        footer { text-align: center; padding: 40px; border-top: 1px solid rgba(0, 240, 255, 0.1); background: #050508; margin-top: 50px; }
+        footer .footer-text { color: var(--text-main); font-size: 1rem; }
+        footer .footer-sub { color: var(--text-muted); font-size: 0.85rem; margin-top: 5px; }
+        footer span { color: var(--skill-cyan); font-weight: 600; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ================= HEADER & DESKTOP MENU ================= */
+#master-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#master-header .logo a {
+    color: #00f2ff;
+    font-size: 28px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#desktop-menu {
+    display: flex;
+    gap: 20px;
+}
+
+/* ================= 3-DOT BUTTON ================= */
+#mobile-dot-btn {
+    display: none; /* পিসিতে জোর করে হাইড করা হলো */
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+}
+
+#mobile-dot-btn .bar {
+    width: 30px;
+    height: 3px;
+    background-color: #00f2ff;
+    border-radius: 3px;
+}
+
+/* ================= PHONE MODE (অটো ফিক্স) ================= */
+@media screen and (max-width: 768px) {
+    /* ১. পিসির অপশনগুলো (HOME, ABOUT) ফোন থেকে চিরতরে মুছে ফেলা */
+    #desktop-menu { 
+        display: none !important; 
+    }
+    
+    /* ২. হেডারটাকে উপর-নিচ করে সাজানো */
+    #master-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 20px !important; /* PRANTO লেখা এবং ৩ ডটের মাঝের দূরত্ব */
+    }
+
+    /* ৩. ৩ ডট মেনুটাকে ফোনে দৃশ্যমান করা */
+    #mobile-dot-btn { 
+        display: flex !important; 
+    }
+    
+    /* যদি তোমার আগের কোনো মেনুর কোড লুকিয়ে থাকে, সেটাকেও হাইড করা হলো */
+    .nav-link { display: none !important; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ================= HEADER & DESKTOP NAV ================= */
+#master-header {
+    position: fixed; /* স্ক্রিনের ওপরে লক থাকবে */
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%;
+    box-sizing: border-box;
+    background-color: #000000; /* ব্যাকগ্রাউন্ড কালো */
+    z-index: 999999 !important; /* কন্টেন্টের ওপরে ভাসিয়ে রাখার জন্য */
+}
+
+.logo-text {
+    color: #00f2ff;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.logo-text span {
+    color: #fff;
+}
+
+#desktop-menu {
+    display: flex;
+    gap: 25px;
+}
+
+#desktop-menu a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+#desktop-menu a.active {
+    color: #00f2ff; /* অ্যাক্টিভ পেজের কালার সায়ান */
+}
+
+/* ================= MOBILE 3-DOT BUTTON ================= */
+#mobile-dot-btn {
+    display: none; /* পিসিতে হাইড */
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 1000000 !important;
+}
+
+#mobile-dot-btn .bar {
+    width: 30px;
+    height: 3px;
+    background-color: #00f2ff;
+    pointer-events: none; /* ক্লিক যেন সরাসরি বাটন ক্যাচ করে */
+}
+
+/* ================= MOBILE MENU OVERLAY ================= */
+#mobMenuOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(to bottom, #00d2ff, #7a28cb); /* সায়ান থেকে পার্পেল গ্রেডিয়েন্ট */
+    z-index: 9999999 !important;
+    flex-direction: column;
+    padding: 30px 25px;
+    box-sizing: border-box;
+}
+
+.mob-close-btn {
+    color: white;
+    font-size: 45px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 40px;
+    align-self: flex-start;
+}
+
+.mob-menu-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.mob-item {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    padding: 18px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    transition: 0.3s ease;
+}
+
+/* Dark Red Animation */
+.mob-item.click-anim {
+    background-color: #8B0000 !important; /* ডার্ক রেড */
+    color: white !important;
+    border-radius: 5px;
+    border-bottom: none;
+    padding-left: 20px;
+    transform: scale(0.98);
+}
+
+/* ================= PHONE MODE FIX ================= */
+@media screen and (max-width: 768px) {
+    /* ১. পিসির মেনু ফোনে গায়েব */
+    #desktop-menu { 
+        display: none !important; 
+    }
+    
+    /* ২. ফোনে লোগো ও ৩ ডট এক লাইনে পাশাপাশি বসবে */
+    #master-header {
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 15px 20px !important;
+    }
+
+    /* ৩. ৩ ডট বাটন অন হবে */
+    #mobile-dot-btn { 
+        display: flex !important; 
+    }
+}
+
+/* সেকশন যেন হেডারের নিচে না ঢোকে তার ফিক্স */
+section, .main-content, #about, #education, #skills, #contact {
+    padding-top: 110px !important;
+    box-sizing: border-box;
+}
+
+
+
+
+
+
+
+
+
+
+/* ==========================================================
+   3-DOT AND PHONE FIX (তোমার অরিজিনাল পিসি ডিজাইন না ভেঙে)
+========================================================== */
+
+/* পিসিতে ৩ ডট ১০০% হাইড থাকবে */
+#mobile-dot-btn {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    z-index: 1000000 !important;
+}
+
+#mobile-dot-btn .bar {
+    width: 28px;
+    height: 3px;
+    background-color: #00f2ff;
+    border-radius: 2px;
+}
+
+/* ================= ONLY FOR MOBILE (ফোনে আসলে যা হবে) ================= */
+@media screen and (max-width: 768px) {
+    /* ১. ফোনে পিসির মেনু অপশনগুলো (Home, About Me) পুরোপুরি ভ্যানিশ */
+    nav ul, nav li { 
+        display: none !important; 
+    }
+    
+    /* ২. ফোনে লোগো বামে থাকবে আর ৩ ডট ডানে থাকবে এক লাইনে */
+    nav {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 20px !important;
+        background: transparent !important;
+    }
+
+    /* ৩. ফোনে ৩ ডট বাটন অন হবে */
+    #mobile-dot-btn { 
+        display: flex !important; 
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    </style>
+</head>
+<body>
+
+   
+
+
+
+
+
+
+<nav>
+    <div class="logo" onclick="location.href='index.html'">PRANTO<span>.</span></div>
+    
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About Me</a></li>
+        <li><a href="education.html">Education</a></li>
+        <li><a href="skills.html">Skills</a></li>
+        <li><a href="contact.html">Contact Me</a></li>
+    </ul>
+
+    <div id="mobile-dot-btn">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+    </div>
+</nav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="content">
+        <h1 class="title">Professional <span>Portfolio</span></h1>
+        <div class="grid">
+            <!-- Priority Values (Top 3) -->
+            <div class="card" style="animation-delay: 0.1s;"><h3>Live Chat & Email Support</h3><p>Delivering high-tier customer success by managing real-time support inquiries and resolving technical issues promptly.</p></div>
+            <div class="card" style="animation-delay: 0.2s;"><h3>Google AI Integration</h3><p>Optimizing technical research and automated workflows by applying Google Gemma 4 models to complex data tasks.</p></div>
+            <div class="card" style="animation-delay: 0.3s;"><h3>Professional Freelancing</h3><p>Maintaining a high reputation on platforms like Upwork and Truelancer, consistently exceeding client expectations.</p></div>
+            
+            <!-- Other Expertises -->
+            <div class="card" style="animation-delay: 0.4s;"><h3>Voice Call Handling</h3><p>Skilled in managing professional voice communications to troubleshoot issues and maintain strong client relationships.</p></div>
+            <div class="card" style="animation-delay: 0.5s;"><h3>Fluent English Communication</h3><p>Ensuring clarity and professionalism in all verbal and written business interactions with global clients.</p></div>
+            <div class="card" style="animation-delay: 0.6s;"><h3>Excel Mastery</h3><p>Specializing in complex data modeling and analytical reporting to enhance business decision-making processes.</p></div>
+            <div class="card" style="animation-delay: 0.7s;"><h3>ChatGPT Plus Power User</h3><p>Utilizing premium AI tools for advanced research, prompt engineering, and creative content generation.</p></div>
+            <div class="card" style="animation-delay: 0.8s;"><h3>Google Maps Expert</h3><p>Contributing extensively to digital infrastructure via local road mapping and verification of regional business profiles.</p></div>
+            <div class="card" style="animation-delay: 0.9s;"><h3>Blockchain Exploration</h3><p>Deeply researching decentralized systems, network security, and distributed ledger technology applications.</p></div>
+            <div class="card" style="animation-delay: 1.0s;"><h3>Flight Tracking Network</h3><p>Hosting specialized ADS-B receiver hardware to support global aviation monitoring and data networks.</p></div>
+            <div class="card" style="animation-delay: 1.1s;"><h3>Android System Modding</h3><p>Advanced technical capability in device rooting, bootloader unlocking, and custom ROM development.</p></div>
+            <div class="card" style="animation-delay: 1.2s;"><h3>Digital Asset Management</h3><p>Managing and trading social media accounts and digital assets on the Onthon marketplace.</p></div>
+            <div class="card" style="animation-delay: 1.3s;"><h3>Community Leadership</h3><p>Active involvement in operational governance of the Shwapnobaj Torun Somobay Samity cooperative.</p></div>
+            <div class="card" style="animation-delay: 1.4s;"><h3>Meta Verified Identity</h3><p>Ensuring professional digital presence through managed Meta Verified premium subscription plans.</p></div>
+            <div class="card" style="animation-delay: 1.5s;"><h3>Tech Gadget Enthusiast</h3><p>Continuously optimizing workspace with high-performance peripherals like QCY MeloBuds N20.</p></div>
+            <div class="card" style="animation-delay: 1.6s;"><h3>Academic Research</h3><p>Focused academic preparation for international studies, bridging theoretical tech and global innovation.</p></div>
+            <div class="card" style="animation-delay: 1.7s;"><h3>Workspace Optimization</h3><p>Advanced management of productivity software suites including Canva Pro and cloud-integrated project tools.</p></div>
+            <div class="card" style="animation-delay: 1.8s;"><h3>Business Verification</h3><p>Expert in establishing and verifying critical infrastructure profiles like the Shingbahura South Hazi Bari complex.</p></div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="mobMenuOverlay" style="display: none !important;">
+    <span class="mob-close-btn" id="close-dots-btn">&times;</span>
+    <div class="mob-menu-content">
+        <a href="index.html" class="mob-item">Home</a>
+        <a href="about.html" class="mob-item">About Me</a>
+        <a href="education.html" class="mob-item">Education</a>
+        <a href="skills.html" class="mob-item">Skills</a>
+        <a href="contact.html" class="mob-item">Contact Me</a>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const dotBtn = document.getElementById("mobile-dot-btn");
+        const closeBtn = document.getElementById("close-dots-btn");
+        const overlay = document.getElementById("mobMenuOverlay");
+
+        // ৩ ডটে ক্লিক লিসেনার
+        if (dotBtn && overlay) {
+            dotBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                overlay.style.setProperty('display', 'flex', 'important');
+            });
+        }
+
+        // ক্রস (x) এ ক্লিক লিসেনার
+        if (closeBtn && overlay) {
+            closeBtn.addEventListener("click", function (e) {
+                overlay.style.setProperty('display', 'none', 'important');
+            });
+        }
+
+        // ডার্ক রেড ক্লিক অ্যানিমেশন
+        const mobItems = document.querySelectorAll('.mob-item');
+        mobItems.forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+                let targetPage = this.getAttribute('href');
+                this.classList.add('click-anim');
+                setTimeout(() => {
+                    window.location.href = targetPage;
+                }, 350);
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <footer>
+        <p class="footer-text">&copy; 2026 <span>Golam Zelane</span>. All Rights Reserved.</p>
+        <p class="footer-sub">Designed with precision & passion.</p>
+    </footer>
+</body>
+</html>
